@@ -21,10 +21,12 @@ export default async function handler(req, res) {
 
         const data = parser.parse(text);
 
-        const items = data.rss.channel.item
+        const rawItems = data?.rss?.channel?.item || [];
+        const itemsArray = Array.isArray(rawItems) ? rawItems : [rawItems];
+
+        const items = itemsArray
             .slice(0, 6)
             .map(item => {
-                // 👇 afbeelding zoeken (verschillende opties)
                 let image = null;
 
                 if (item["media:content"]?.["@_url"]) {
@@ -39,9 +41,9 @@ export default async function handler(req, res) {
                 }
 
                 return {
-                    title: item.title,
-                    link: item.link,
-                    description: item.description,
+                    title: item.title || "Geen titel",
+                    link: item.link || "#",
+                    description: item.description || "",
                     image: image
                 };
             });
@@ -49,7 +51,7 @@ export default async function handler(req, res) {
         res.status(200).json(items);
 
     } catch (err) {
-        console.error(err);
+        console.error("ERROR:", err); // 👈 check Vercel logs
         res.status(500).json({ error: "Kan RSS niet ophalen" });
     }
 }
