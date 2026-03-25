@@ -1,10 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 
-export default async function handler(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
-
+export async function GET() {
     try {
         const rssUrl = "https://www.dekoudebron.nl/feed/rss2";
         const response = await fetch(rssUrl);
@@ -48,10 +44,10 @@ export default async function handler(req, res) {
                 };
             });
 
-        res.status(200).json(items);
+        return Response.json(items);
 
     } catch (err) {
-        console.error("ERROR:", err); // 👈 check Vercel logs
-        res.status(500).json({ error: "Kan RSS niet ophalen" });
+        console.error("ERROR:", err);
+        return Response.json({ error: "Kan RSS niet ophalen" }, { status: 500 });
     }
 }
