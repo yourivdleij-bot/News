@@ -11,7 +11,7 @@
 
   .news-widget {
     width: 100%;
-    max-width: 960px; /* past op grotere schermen */
+    max-width: 960px;
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
@@ -27,8 +27,8 @@
 
   #news-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 kolommen */
-    gap: 15px; /* ruimte tussen vakjes */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
 
   .news-item {
@@ -39,8 +39,7 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 100px;
+    min-height: 200px;
   }
 
   .news-item a {
@@ -57,9 +56,18 @@
   .news-description {
     font-size: 0.85em;
     color: #555;
+    margin-top: 5px;
   }
 
-  /* Responsive: minder kolommen op kleinere schermen */
+  .news-image {
+    max-width: 100%;
+    border-radius: 4px;
+    margin: 5px 0;
+    object-fit: cover;
+    height: 120px;
+  }
+
+  /* Responsive */
   @media (max-width: 800px) {
     #news-container {
       grid-template-columns: repeat(2, 1fr);
@@ -78,9 +86,7 @@
 
 <div class="news-widget">
   <h2>Laatste Nieuws</h2>
-  <div id="news-container">
-    <!-- Artikelen worden hier geladen -->
-  </div>
+  <div id="news-container"></div>
 </div>
 
 <script>
@@ -95,9 +101,18 @@ async function loadNews() {
     articles.slice(0, 6).forEach(article => {
       const item = document.createElement('div');
       item.className = 'news-item';
+
+      // Haal afbeelding uit description als <img> aanwezig
+      let imgHtml = '';
+      const imgMatch = article.description.match(/<img.*?src="(.*?)"/);
+      if (imgMatch && imgMatch[1]) {
+        imgHtml = `<img src="${imgMatch[1]}" alt="${article.title}" class="news-image">`;
+      }
+
       item.innerHTML = `
         <a href="${article.link}" target="_blank">${article.title}</a>
-        <div class="news-description">${article.description}</div>
+        ${imgHtml}
+        <div class="news-description">${article.description.replace(/<img.*?>/g, '')}</div>
       `;
       container.appendChild(item);
     });
